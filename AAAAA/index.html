@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拜拜網頁</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('文昌帝君圖片路徑.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-shadow: 2px 2px 4px #000;
+            overflow: hidden;
+        }
+
+        #merit-display {
+            position: absolute;
+            top: 10%;
+            text-align: center;
+            font-size: 2em;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .incense {
+            width: 200px; /* Further increased size for incense */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div id="merit-display">功德總計: <span id="merit-count">0</span></div>
+    <img src="您的香圖片路徑.png" alt="香" class="incense" id="incense">
+
+    <script>
+        let meritCount = 0;
+        const meritDisplay = document.getElementById('merit-count');
+        const incense = document.getElementById('incense');
+
+        // Store and fetch data by IP using local storage for simplicity
+        const userIpKey = 'meritCount';
+        if (localStorage.getItem(userIpKey)) {
+            meritCount = parseInt(localStorage.getItem(userIpKey));
+            meritDisplay.textContent = meritCount;
+        }
+
+        // Track motion for up and down detection
+        let lastY = null;
+        let hasMovedUp = false;
+        let hasMovedDown = false;
+
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const y = touch.clientY;
+
+            if (lastY !== null) {
+                if (y > lastY + 20) {
+                    hasMovedDown = true;
+                } else if (y < lastY - 20) {
+                    hasMovedUp = true;
+                }
+
+                if (hasMovedUp && hasMovedDown) {
+                    incrementMerit();
+                    hasMovedUp = false;
+                    hasMovedDown = false;
+                }
+            }
+
+            lastY = y;
+            moveIncense(touch);
+        });
+
+        document.addEventListener('touchend', () => {
+            lastY = null;
+            hasMovedUp = false;
+            hasMovedDown = false;
+        });
+
+        function moveIncense(touch) {
+            const x = touch.clientX;
+            const y = touch.clientY;
+            incense.style.left = `${x}px`;
+            incense.style.top = `${y}px`;
+        }
+
+        function incrementMerit() {
+            meritCount++;
+            meritDisplay.textContent = meritCount;
+            localStorage.setItem(userIpKey, meritCount);
+        }
+
+        // Handle fallback for non-touch devices
+        incense.addEventListener('click', () => {
+            incrementMerit();
+        });
+    </script>
+</body>
+</html>
